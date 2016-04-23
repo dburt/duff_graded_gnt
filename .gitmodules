@@ -1,0 +1,3 @@
+[submodule "sblgnt"]
+	path = sblgnt
+	url = https://github.com/morphgnt/sblgnt
