@@ -141,15 +141,21 @@ end
 
 if $0 == __FILE__
 
-  require 'rubygems'
-  require 'fastercsv'
+  begin
+    require 'csv'
+  rescue LoadError  # Ruby 1.8
+    require 'rubygems'
+    require 'fastercsv'
+    CSV = FasterCSV
+    def CSV(*args, &blk) FasterCSV(*args, &blk) end
+  end
 
   include DuffGradedGNT
 
   morphgnt = File.read('sblgnt/78-Phm-morphgnt.txt')
 
   print("\xef\xbb\xbf")  # UTF-8 byte-order mark for Microsoft Excel
-  FasterCSV(STDOUT) do |csv|  #, :encoding => 'u'
+  CSV(STDOUT) do |csv|  #, :encoding => 'u'
     csv << MORPH_LINE_PATTERN_MATCHES + %w[duff_parsing_chapter duff_vocab_chapter]
     morphgnt.each_line do |line|
       m = MORPH_LINE_PATTERN.match(line)
