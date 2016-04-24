@@ -76,19 +76,18 @@ module DuffGradedGNT
     ],
     16 => [
       # perfect/pluperfect active/middle/passive indicative/participle
-      /...I-.--/,   # all indicative verbs
-      /-..P...-/,   # all participles
-      # /2..D-.--/,   # 2nd person imperatives (?)
-      # /-..N----/,   # all infinitives (?)
+      /.(X|Y).I-.--/,   # perfect/pluperfect indicative
+      /-X.P...-/,       # perfect participles
+      /-X.N...-/,       # perfect infinitive (Note on p. 180)
     ],
     17 => [
-      /...S-.--/,   # present/aorist(/etc.?) active/middle/passive subjunctive
+      /.(P|A).S-.--/,   # present/aorist active/middle/passive subjunctive
     ],
     18 => [
-      /3..D-.--/,   # 3rd person imperatives!
+      /3(P|A).D-.--/,   # 3rd person imperatives!
     ],
     20 => [
-      /...O-.--/,   # optative mood
+      /.(P|A).O-.--/,   # optative mood
       /----..../,   # adverbs and comparative/superlative adjectives
     ],
   }
