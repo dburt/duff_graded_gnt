@@ -141,6 +141,7 @@ end
 
 if $0 == __FILE__
 
+  require 'pathname'
   begin
     require 'csv'
   rescue LoadError  # Ruby 1.8
@@ -152,23 +153,22 @@ if $0 == __FILE__
 
   include DuffGradedGNT
 
-  morphgnt = File.read('sblgnt/78-Phm-morphgnt.txt')
-
   print("\xef\xbb\xbf")  # UTF-8 byte-order mark for Microsoft Excel
   CSV(STDOUT) do |csv|  #, :encoding => 'u'
-    csv << MORPH_LINE_PATTERN_MATCHES + %w[duff_parsing_chapter duff_vocab_chapter]
-    morphgnt.each_line do |line|
-      m = MORPH_LINE_PATTERN.match(line)
-      next STDERR.puts "Unmatched line: #{line}" unless m
-      ch_p = duff_chapter_required_for_parsing(m[MX['parsing']])
-      ch_v = duff_chapter_required_for_vocab(m[MX['lemma']])
-      csv << m.to_a[1..-1] + [ch_p, ch_v]
-      #puts [
-      #  m[mx['passage_chapter']].to_i,
-      #  m[mx['passage_verse']].to_i,
-      #  duff_chapter_required_for_parsing[m[mx['parsing']]],
-      #  duff_chapter_required_for_vocab[m[mx['lemma']]],
-      #]
+    csv <<
+      ['file'] +
+      MORPH_LINE_PATTERN_MATCHES +
+      %w[duff_parsing_chapter duff_vocab_chapter]
+
+    Pathname.glob('sblgnt/*-morphgnt.txt').each do |path|
+      STDERR.puts path.basename
+      path.read.each_line do |line|
+        m = MORPH_LINE_PATTERN.match(line)
+        next STDERR.puts "Unmatched line: #{line}" unless m
+        ch_p = duff_chapter_required_for_parsing(m[MX['parsing']])
+        ch_v = duff_chapter_required_for_vocab(m[MX['lemma']])
+        csv << [path.basename] + m.to_a[1..-1] + [ch_p || '-', ch_v || '-']
+      end
     end
   end
 
