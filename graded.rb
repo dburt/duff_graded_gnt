@@ -97,6 +97,12 @@ module DuffGradedGNT
     memo
   end
 
+  BOOKS = %w[
+    Mt Mk Lk Jn Ac
+    Ro 1Co 2Co Ga Eph Php Col 1Th 2Th 1Ti 2Ti Tit Phm
+    Heb Jas 1Pe 2Pe 1Jn 2Jn 3Jn Jud Rev
+  ]
+
   def vocab
     JSON.load(File.read('duff_vocab.json'))
   end
@@ -136,6 +142,10 @@ module DuffGradedGNT
     [ch_p, ch_v].max
   end
 
+  def human_ref(passage)
+    "#{BOOKS[passage[0, 2].to_i - 1]} #{passage[2, 2].to_i}:#{passage[4, 2].to_i}"
+  end
+
 end
 
 if $0 == __FILE__
@@ -152,21 +162,53 @@ if $0 == __FILE__
 
   include DuffGradedGNT
 
+  reader = Hash.new {|h, k| h[k] = [] }
+  verse = ""
+  ch_max = 0
+  previous_line_passage = nil
+
   print("\xef\xbb\xbf")  # UTF-8 byte-order mark for Microsoft Excel
-  CSV(STDOUT) do |csv|  #, :encoding => 'u'
+  CSV.open("morphgnt_duff.csv", "w") do |csv|  #, :encoding => 'u'
     csv <<
       ['file'] +
       MORPH_LINE_PATTERN_MATCHES +
       %w[duff_parsing_chapter duff_vocab_chapter]
 
-    Pathname.glob('sblgnt/*-morphgnt.txt').each do |path|
+    Pathname.glob('sblgnt/*-morphgnt.txt').sort.each do |path|
       STDERR.puts path.basename
       path.read.each_line do |line|
         m = MORPH_LINE_PATTERN.match(line)
         next STDERR.puts "Unmatched line: #{line}" unless m
+
+        if previous_line_passage && m[MX['passage']] != previous_line_passage
+          reader[ch_max] << [verse, previous_line_passage] if ch_max < 99
+          ch_max = 0
+          verse = ""
+        end
+
         ch_p = duff_chapter_required_for_parsing(m[MX['parsing']])
         ch_v = duff_chapter_required_for_vocab(m[MX['lemma']])
-        csv << [path.basename] + m.to_a[1..-1] + [ch_p || '-', ch_v || '-']
+        csv << [path.basename] + m.to_a[1..-1] + [ch_p, ch_v]
+
+        ch_max = [ch_max, ch_p || 99, ch_v || 99].max
+        verse << m[MX['text_incl_punctuation']] << " "
+        previous_line_passage = m[MX['passage']]
+      end
+    end
+  end
+
+  File.open("reader_duff.md", "w") do |f|
+    f.puts "# Graded Reader for Duff's Elements"
+    f.puts
+    f.puts "Verses readable without help after completing each Duff chapter."
+    f.puts
+    f.puts "[Credit](https://github.com/dburt/duff_graded_gnt)"
+    reader.sort.each do |ch, verses|
+      f.puts
+      f.puts "## #{ch}"
+      f.puts
+      verses.each do |words, ref|
+        f.puts "* #{words} (#{human_ref(ref)})"
       end
     end
   end
