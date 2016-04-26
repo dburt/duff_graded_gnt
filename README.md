@@ -2,7 +2,7 @@
 
 * Loads GNT as submodule, so `git submodule update --init`.
 * Usable as a Ruby library with `require`, providing Duff parsing by chapter.
-* When run as a command, copies whole parsed GNT on standard output, with required Duff chapters added for each word.
+* When run as a command, copies whole parsed GNT with required Duff chapters added for each word to morphgnt_duff.csv, and readable whole verses for each chapter to reader_duff.md.
 
 ## Sources:
 
@@ -12,7 +12,8 @@
 
 ## Yields:
 
-* Each word in the GNT tagged with the Duff chapters for the vocabulary and for the parsing
+* Each word in the GNT tagged with the Duff chapters for the vocabulary and for the parsing (morphgnt_duff.csv)
+* A graded reader formatted in markdown (reader_duff.md)
 
 ## Can be used to calculate:
 
