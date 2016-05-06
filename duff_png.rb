@@ -48,25 +48,24 @@ color_map = {
     99 => "#000"
 }
 prev_match = //.match("")
-book = -1
-word = -1
-drawing = Drawing.new(19470, 27)
+row = 0
+col = 0
+drawing = Drawing.new(1240, 290)
 ARGF.each_line do |line|
     match = pat.match(line)
     next unless match
 
-    if match[4] != prev_match[4]  # new book
-        book += 1
-        word = 0
-    elsif match[5] != prev_match[5]  # new chapter
-        word += 1  # leave a gap
+    if match[4] != prev_match[4] || match[5] != prev_match[5]
+        row += 1
+        row += 1 if match[4] != prev_match[4]  # extra line between books
+        col = 0
         print "#{match[4]}#{match[5]} "
         STDOUT.flush
     end
 
-    drawing.draw :y => book, :x => word, :color => color_map[match[3].to_i]
+    drawing.draw :y => row, :x => col, :color => color_map[match[3].to_i]
 
     prev_match = match
-    word += 1
+    col += 1
 end
 drawing.save("duff.png")
