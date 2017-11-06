@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -Eutf-8:utf-8
+#!/usr/bin/env ruby -Eutf-8:utf-8
 
 require 'open-uri'
 
@@ -6,8 +6,19 @@ class Verse < Struct.new(:text, :ref, :duff_chapter)
   def english_url
     "http://labs.bible.org/api/?passage=#{ref.sub(' ', '+')}"
   end
+
   def english
     @english ||= open(english_url).read.chomp
+  end
+
+  def text_monotonic
+    #FIXME: should remove breathing marks first
+    text.unicode_normalize(:nfd).gsub(/\p{In Combining Diacritical Marks}+/, "\u0301")
+  end
+
+  def say_text
+    #FIXME: try espeak as well as Mac's say
+    `say -v Melina "#{text_monotonic}"`
   end
 end
 
@@ -27,14 +38,18 @@ File.read('reader_duff.md').each_line do |line|
 	end
 end
 
+puts "Use Ctrl+C or Ctrl+Break to quit."
 loop do
   verse = verses[rand(chapter_starts[max_chapter + 1])]
   prompt, answer = verse.text, verse.english
-  prompt, answer = answer, prompt if rand < 0.5
+  direction = rand < 0.5 ? :en_el : :el_en
+  prompt, answer = answer, prompt if direction == :en_el
   puts prompt
   print '> '
+  verse.say_text if direction == :el_en
   STDIN.gets
   puts answer
+  verse.say_text if direction == :en_el
   puts
 end
 
