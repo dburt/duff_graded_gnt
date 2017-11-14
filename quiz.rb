@@ -2,7 +2,7 @@
 
 require 'open-uri'
 
-class Verse < Struct.new(:text, :ref, :duff_chapter)
+class Verse < Struct.new(:text, :ref, :duff_chapter, :id)
   def english_url
     "http://labs.bible.org/api/?passage=#{ref.sub(' ', '+')}"
   end
@@ -22,6 +22,27 @@ class Verse < Struct.new(:text, :ref, :duff_chapter)
   end
 end
 
+class Question
+  attr_reader :direction
+  def initialize(verse, direction = nil)
+    @verse = verse
+    @direction = direction || (rand < 0.5 ? :en_el : :el_en)
+  end
+  def method_missing(meth, *args)
+    if @verse.respond_to?(meth)
+      @verse.send(meth, *args)
+    else
+      raise
+    end
+  end
+  def prompt
+    @direction == :el_en ? text : english
+  end
+  def answer
+    @direction == :el_en ? english : text
+  end
+end
+
 class Quiz
   attr_reader :verses, :chapter, :chapter_starts
 
@@ -36,7 +57,7 @@ class Quiz
         @chapter = $1.to_i
         @chapter_starts[chapter] = @verses.length
       when /^* (.*?) \((.*?)\)/
-        @verses << Verse.new($1, $2, @chapter)
+        @verses << Verse.new($1, $2, @chapter, @verses.count)
       end
     end
   end
