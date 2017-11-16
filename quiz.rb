@@ -4,16 +4,17 @@ require 'open-uri'
 
 class Verse < Struct.new(:text, :ref, :duff_chapter, :id)
   def english_url
-    "http://labs.bible.org/api/?passage=#{ref.sub(' ', '+')}"
+    "http://labs.bible.org/api/?formatting=plain&passage=#{ref.sub(' ', '+')}"
   end
 
   def english
-    @english ||= open(english_url).read.chomp
+    @english ||= open(english_url).read.chomp + " (NET Bible ©1996-2016 Biblical Studies Press)"
   end
 
   def text_monotonic
-    #FIXME: should remove breathing marks and iota subscripts first
-    text.unicode_normalize(:nfd).gsub(/\p{In Combining Diacritical Marks}+/, "\u0301")
+    text.unicode_normalize(:nfd).
+      gsub(/[\u0345\u0312-\u0315]/, '').  # remove iota subscript and breathing marks
+      gsub(/\p{In Combining Diacritical Marks}+/, "\u0301")  # make all accents oxia
   end
 
   def say_text

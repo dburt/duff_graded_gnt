@@ -17,15 +17,17 @@ get '/level/:n' do
     memo[attr] = verse.send(attr)
     memo
   end.to_json
-  question = Question.new(verse)
+  q = Question.new(verse)
   <<-END
     <form method='post'>
-      <input type="hidden" name="id" value="#{question.id}"/>
-      <input type="hidden" name="direction" value="#{question.direction}"/>
-      <p>#{question.prompt}</p>
-      <p><input name="answer"/></p>
+      <input type="hidden" name="id" value="#{q.id}"/>
+      <input type="hidden" name="direction" value="#{q.direction}"/>
+      <p>Q: #{q.prompt}</p>
+      <div id="say" lang="el">#{q.text_monotonic if q.direction == :el_en}</div>
+      <p>A: <input name="answer"/></p>
       <p><input type="submit"/></p>
     </form>
+    #{say_script}
   END
 end
 
@@ -35,9 +37,27 @@ post '/level/:n' do
   v = Quiz.instance.verses[params[:id].to_i]
   q = Question.new(v, params[:direction].to_sym)
   <<-END
-    <p>#{q.prompt}</p>
-    <p>#{ans}</p>
-    <p>#{q.answer}</p>
+    <p>Q: #{q.prompt}</p>
+    <p>A (you): #{ans}</p>
+    <p>A (Bible): #{q.answer}</p>
+    <div id="say" lang="el">#{q.text_monotonic if q.direction == :en_el}</div>
     <a href="#{request.path}">Next</a>
+    #{say_script}
+  END
+end
+
+def say_script
+  <<-END
+    <style>#say {font-size: 0} #say::after {content: '▶'; font-size: 20px}</style>
+    <script>
+      function say() {
+        var utterance = new SpeechSynthesisUtterance(document.getElementById('say').innerText);
+        utterance.lang = 'el';
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      }
+      say()
+      document.getElementById('say').addEventListener('click', function(ev) { say(); }, false);
+    </script>
   END
 end
