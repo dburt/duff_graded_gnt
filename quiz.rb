@@ -18,8 +18,25 @@ class Verse < Struct.new(:text, :ref, :duff_chapter, :id)
   end
 
   def say_text
-    #FIXME: try espeak as well as Mac's say
-    `say -v Melina "#{text_monotonic}"`
+    Speaker.say text_monotonic
+  end
+end
+
+class Speaker
+  def self.say(text)
+    system(*command, text)
+  end
+
+  def self.command
+    @command ||= begin
+      if system('espeak', '--version')
+        %w[espeak -v el -s 130]
+      elsif system('say', '')
+        %w[say -v Melina]
+      else
+        'false'
+      end
+    end
   end
 end
 
