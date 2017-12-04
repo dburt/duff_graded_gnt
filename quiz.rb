@@ -69,6 +69,8 @@ class Quiz
     @chapter = 0
     @chapter_starts = {1 => 0, 2 => 0}
 
+    ensure_reader_exists
+
     File.read('reader_duff.md').each_line do |line|
       case line
       when /^## (\d+)/
@@ -77,6 +79,12 @@ class Quiz
       when /^* (.*?) \((.*?)\)/
         @verses << Verse.new($1, $2, @chapter, @verses.count)
       end
+    end
+  end
+
+  def ensure_reader_exists
+    unless File.exist?('reader_duff.md')
+      system './graded.rb'
     end
   end
 
