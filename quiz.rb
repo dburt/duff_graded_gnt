@@ -41,6 +41,8 @@ class Speaker
 end
 
 class Question
+  # TODO: instead of merely direction, allow multiple question types:
+  # e.g. translate_from, translate_to, dictate, speak
   attr_reader :direction
   def initialize(verse, direction = nil)
     @verse = verse

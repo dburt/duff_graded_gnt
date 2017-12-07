@@ -1,0 +1,8 @@
+<p>Q: <%= @q.prompt %></p>
+<p>A (you): <%= @ans %></p>
+<p>A (Bible): <%= @q.answer %></p>
+<% if @q.direction == :en_el %>
+  <%= erb :_say, locals: { text: @q.text_monotonic } %>
+<% end %>
+
+<a href="<%= request.path %>" class="btn btn-primary">Next</a>

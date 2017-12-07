@@ -1,0 +1,10 @@
+<form method='post'>
+  <input type="hidden" name="id" value="<%= @q.id %>"/>
+  <input type="hidden" name="direction" value="<%= @q.direction %>"/>
+  <p>Q: <%= @q.prompt %></p>
+  <% if @q.direction == :el_en %>
+    <%= erb :_say, locals: { text: @q.text_monotonic } %>
+  <% end %>
+  <p>A: <input name="answer"/></p>
+  <p><input type="submit" value="Submit" class="btn btn-primary" /></p>
+</form>
