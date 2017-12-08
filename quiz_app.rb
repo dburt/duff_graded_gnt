@@ -11,7 +11,6 @@ get '/level/:n' do
   max_chapter = params[:n].to_i
   return "Choose a chapter between 3 and 20." unless max_chapter.between?(3, 20)
   verse = Quiz.instance.random_verse(max_chapter)
-  verse.to_json
   [:text, :english, :text_monotonic, :ref, :duff_chapter].inject({}) do |memo, attr|
     memo[attr] = verse.send(attr)
     memo
