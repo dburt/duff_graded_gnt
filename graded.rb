@@ -104,7 +104,7 @@ module DuffGradedGNT
   ]
 
   def vocab
-    JSON.load(File.read('duff_vocab.json'))
+    @vocab ||= JSON.load(File.read('duff_vocab.json'))
   end
 
   def duff_chapter_required_for_parsing(parsing)
@@ -146,6 +146,17 @@ module DuffGradedGNT
     "#{BOOKS[passage[0, 2].to_i - 1]} #{passage[2, 2].to_i}:#{passage[4, 2].to_i}"
   end
 
+  def each_morphgnt_line
+    Pathname.glob('sblgnt/*-morphgnt.txt').sort.each do |path|
+      STDERR.puts path.basename
+      path.read.each_line do |line|
+        m = MORPH_LINE_PATTERN.match(line)
+        next STDERR.puts "Unmatched line: #{line}" unless m
+        yield path, line, m
+      end
+    end
+  end
+
 end
 
 if $0 == __FILE__
@@ -174,26 +185,20 @@ if $0 == __FILE__
       MORPH_LINE_PATTERN_MATCHES +
       %w[duff_parsing_chapter duff_vocab_chapter]
 
-    Pathname.glob('sblgnt/*-morphgnt.txt').sort.each do |path|
-      STDERR.puts path.basename
-      path.read.each_line do |line|
-        m = MORPH_LINE_PATTERN.match(line)
-        next STDERR.puts "Unmatched line: #{line}" unless m
-
-        if previous_line_passage && m[MX['passage']] != previous_line_passage
-          reader[ch_max] << [verse, previous_line_passage] if ch_max < 99
-          ch_max = 0
-          verse = ""
-        end
-
-        ch_p = duff_chapter_required_for_parsing(m[MX['parsing']])
-        ch_v = duff_chapter_required_for_vocab(m[MX['lemma']])
-        csv << [path.basename] + m.to_a[1..-1] + [ch_p, ch_v]
-
-        ch_max = [ch_max, ch_p || 99, ch_v || 99].max
-        verse << m[MX['text_incl_punctuation']] << " "
-        previous_line_passage = m[MX['passage']]
+    each_morphgnt_line do |path, line, m|
+      if previous_line_passage && m[MX['passage']] != previous_line_passage
+        reader[ch_max] << [verse, previous_line_passage] if ch_max < 99
+        ch_max = 0
+        verse = ""
       end
+
+      ch_p = duff_chapter_required_for_parsing(m[MX['parsing']])
+      ch_v = duff_chapter_required_for_vocab(m[MX['lemma']])
+      csv << [path.basename] + m.to_a[1..-1] + [ch_p, ch_v]
+
+      ch_max = [ch_max, ch_p || 99, ch_v || 99].max
+      verse << m[MX['text_incl_punctuation']] << " "
+      previous_line_passage = m[MX['passage']]
     end
   end
 
