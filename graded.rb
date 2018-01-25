@@ -6,7 +6,7 @@ module DuffGradedGNT
 
   MORPH_LINE_PATTERN = /
     ((\d\d)(\d\d)(\d\d))
-    \ (A-|C-|D-|I-|N-|P-|RA|RD|RI|RP|RR|V-|X-)
+    \ (A-|C-|D-|I-|N-|P-|RA|RD|RI|RP|RR|V-|X-|..)
     \ ((1|2|3|-)(P|I|F|A|X|Y|-)(A|M|P|-)(I|D|S|O|N|P|-)(N|G|D|A|V|-)(S|P|-)(M|F|N|-)(C|S|-))
     \ (\S+)
     \ (\S+)
@@ -103,6 +103,9 @@ module DuffGradedGNT
     Heb Jas 1Pe 2Pe 1Jn 2Jn 3Jn Jud Rev
   ]
 
+  # LXX
+  BOOKS = %w[ Gen Exod Lev Num Deut JoshB JoshA JudgesB JudgesA Ruth 1Sam 2Sam 1Kings 2Kings 1Chron 2Chron 1Esdras 2Esdras Esther Judith TobitBA TobitS 1Macc 2Macc 3Macc 4Macc Psalms Odes Proverbs Qoheleth Canticles Job Wisdom Sirach PsSol Hosea Micah Amos Joel Jonah Obadiah Nahum Habakkuk Zeph Haggai Zech Malachi Isaiah Jer Baruch EpJer Lam Ezek BelOG BelTh DanielOG DanielTh SusOG SusTh ]
+
   def vocab
     @vocab ||= JSON.load(File.read('duff_vocab.json'))
   end
@@ -147,7 +150,7 @@ module DuffGradedGNT
   end
 
   def each_morphgnt_line
-    Pathname.glob('sblgnt/*-morphgnt.txt').sort.each do |path|
+    Pathname.glob('lxx.txt').sort.each do |path|
       STDERR.puts path.basename
       path.read.each_line do |line|
         m = MORPH_LINE_PATTERN.match(line)

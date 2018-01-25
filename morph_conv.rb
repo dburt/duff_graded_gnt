@@ -60,7 +60,7 @@ if __FILE__ == $0
           m = line.match MORPH_LINE_PATTERN
           parsing = "#{m[MX['v_person']] || '-'}#{m[MX['v_tense']] || m[MX['p_tense']] || '-'}#{m[MX['v_voice']] || m[MX['p_voice']] || '-'}#{m[MX['v_mood']] || m[MX['p_mood']] || '-'}#{m[MX['n_case']] || m[MX['p_case']] || '-'}#{m[MX['n_number']] || m[MX['v_number']] || m[MX['p_number']] || '-'}#{m[MX['n_gender']] || m[MX['p_gender']] || '-'}#{m[MX['n_degree']] || '-'}"
           word = m[MX['word']]
-          puts "#{book_number}#{"%02d" % chapter}#{"%02d" % verse} #{m[MX['part_of_speech']]} #{parsing} #{word} #{word} #{word} #{m[MX['lemma']]}"
+          puts "#{book_number}#{"%02d" % chapter}#{"%02d" % verse} #{m[MX['part_of_speech']][0, 2]} #{parsing} #{word} #{word} #{word} #{m[MX['lemma']]}"
         when /^\s*$/
         else
           puts "unrecognized: #{line}"
