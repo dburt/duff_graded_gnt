@@ -28,7 +28,9 @@ end; nil
 
 book_lemma_freqs = Hash.new {|h, k| h[k] = [] }
 each_morphgnt_line do |path, line, m|
-  book_lemma_freqs[path.basename.to_s[3, 3]] << vocab_rank[m[MX['lemma']]]
+  #book_name = path.basename.to_s[3, 3]
+  book_name = BOOKS[ m[MX['passage_book']].to_i ]
+  book_lemma_freqs[book_name] << vocab_rank[m[MX['lemma']]]
 end; nil
 f = File.open("book_lemma_freqs.csv", "w")
 f.puts "book,80%,90%,95%,97%,99%,100%"
@@ -43,7 +45,9 @@ puts File.read("book_lemma_freqs.csv")
 
 vocab_by_book = Hash.new {|h, k| h[k] = Set.new }
 each_morphgnt_line do |path, line, m|
-  vocab_by_book[path.basename.to_s[3, 3]] << m[MX['lemma']]
+  #book_name = path.basename.to_s[3, 3]
+  book_name = BOOKS[ m[MX['passage_book']].to_i ]
+  vocab_by_book[book_name] << m[MX['lemma']]
 end; nil
 duff_vocab = vocab.values.flatten; nil
 vocab_by_book.each do |book, lemmas|
