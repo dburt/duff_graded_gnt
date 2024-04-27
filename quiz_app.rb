@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'sinatra'
+require 'bundler'
+Bundler.require
+
 require_relative 'quiz'
 
 get '/' do

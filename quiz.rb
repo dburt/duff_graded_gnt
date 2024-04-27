@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'bundler'
+Bundler.require
+
 require 'open-uri'
 
 class Verse < Struct.new(:text, :ref, :duff_chapter, :id)
