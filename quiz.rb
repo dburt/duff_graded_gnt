@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -Eutf-8:utf-8
+#!/usr/bin/env ruby
 
 require 'open-uri'
 
@@ -8,7 +8,7 @@ class Verse < Struct.new(:text, :ref, :duff_chapter, :id)
   end
 
   def english
-    @english ||= open(english_url).read.chomp + " (NET Bible ©1996-2016 Biblical Studies Press)"
+    @english ||= URI.open(english_url).read.chomp + " (NET Bible ©1996-2016 Biblical Studies Press)"
   end
 
   def text_monotonic
