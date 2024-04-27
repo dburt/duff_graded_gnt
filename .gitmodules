@@ -3,4 +3,4 @@
 	url = https://github.com/morphgnt/sblgnt
 [submodule "lxxmorph-unicode"]
 	path = lxxmorph-unicode
-	url = https://scm.smithfam.info/nathan/lxxmorph-unicode.git
+	url = https://github.com/nathans/lxxmorph-unicode.git
